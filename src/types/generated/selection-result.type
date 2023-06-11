@@ -1,0 +1,45 @@
+import { Scalar, ValidatedSelector } from "../simple"
+import { CompleteSelector } from "./complete-selector"
+
+type function Selected = (S, T) => ^{
+  if (T extends Scalar) {
+    return T
+  } else if (T extends Array<infer U>) {
+    return Array<SelectionResult<S, U>>
+  } else {
+    return SelectionResult<S, T>
+  }
+}
+
+export type function SelectionResult = (S, T) => ^{
+  if (CompleteSelector<T> extends S) {
+    return ^{
+      for (Key in keyof S) {
+        return {
+          key: Key,
+          value: ^{
+            if (Key extends keyof T) {
+              return Selected<S[Key], T[Key]>
+            } else {
+              return never
+            }
+          }
+        }
+      }
+    }
+  } else {
+    return never
+  }
+}
+
+/* defined here to avoid circular imports */
+export type function Selector = (S, T) => ^{
+	if (CompleteSelector<T> extends S) {
+		return & [
+			S,
+			ValidatedSelector<SelectionResult<S, T>>
+		]
+	} else {
+		return never
+	}
+}

@@ -1,0 +1,18 @@
+import { Scalar } from "../simple"
+
+export type function CompleteSelector = (T) => ^{
+	for (Key in keyof T) {
+		return {
+			key: Key,
+			value: ^{
+				if (T[Key] extends Scalar) {
+					return true
+				} else if(T[Key] extends Array<infer U>) {
+					return CompleteSelector<U>
+				} else {
+					return CompleteSelector<T[Key]>
+				}
+			}
+		}
+	}
+}

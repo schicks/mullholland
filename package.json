@@ -4,7 +4,13 @@
   "description": " A library for creating type safe graphql queries in typescript without code generation ",
   "main": "dist/index.js",
   "scripts": {
-    "test": "jest"
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit",
+    "test": "jest",
+    "format": "prettier --write .",
+    "typetype:format": "prettier --write src/types/generated/*.ts",
+    "typetype:clean": "rm src/types/generated/*.ts",
+    "typetype:build": "npm run typetype:clean && typetype build src/types/generated && npm run typetype:format"
   },
   "repository": {
     "type": "git",
@@ -22,7 +28,14 @@
   "homepage": "https://github.com/schicks/mullholland#readme",
   "devDependencies": {
     "@mistlog/typetype": "^0.0.30",
+    "@trivago/prettier-plugin-sort-imports": "^4.1.1",
+    "@typescript-eslint/eslint-plugin": "^5.59.9",
+    "@typescript-eslint/parser": "^5.59.9",
+    "eslint": "^8.42.0",
+    "eslint-plugin-expect-type": "^0.2.3",
+    "expect-type": "^0.16.0",
     "jest": "^29.5.0",
+    "prettier": "^2.8.8",
     "ts-jest": "^29.1.0",
     "typescript": "^5.1.3"
   }
