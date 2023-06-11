@@ -1,4 +1,5 @@
 import { Selector } from "./types/generated/selection-result";
+import { Writeable, Simplify } from "./types/simple";
 
 /**
  * Entrypoint function for creating well typed selectors.
@@ -22,11 +23,11 @@ import { Selector } from "./types/generated/selection-result";
  *      }
  *    }
  * ]
- * })
+ * } as const)
  * type GetUsersResult = Infer<typeof getUsers>
  * ```
  */
 export const make =
   <T>() =>
-  <S>(s: S): Selector<S, T> =>
+  <S>(s: S): Simplify<Selector<Writeable<S>, T>> =>
     s as any; //eslint-disable-line @typescript-eslint/no-explicit-any

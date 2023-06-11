@@ -6,6 +6,14 @@ type function Selected = (S, T) => ^{
     return T
   } else if (T extends Array<infer U>) {
     return Array<SelectionResult<S, U>>
+  } else if (T extends type (args: infer A) => infer R) {
+    return ^{
+      if (S extends [A, infer SR]) { /* TODO I think the issue is here, but need more test cases */
+        return SelectionResult<SR, R>
+      } else {
+        return never /* unreachable: S is a selector for T by construction in SelectionResult */
+      }
+    }
   } else {
     return SelectionResult<S, T>
   }
@@ -21,14 +29,14 @@ export type function SelectionResult = (S, T) => ^{
             if (Key extends keyof T) {
               return Selected<S[Key], T[Key]>
             } else {
-              return never
+              return "keys of S are keys of T, so this case is impossible but hard to prove"
             }
           }
         }
       }
     }
   } else {
-    return never
+    return "invalid selector. S is not a selector for T."
   }
 }
 
@@ -40,6 +48,6 @@ export type function Selector = (S, T) => ^{
 			ValidatedSelector<SelectionResult<S, T>>
 		]
 	} else {
-		return never
+		return "invalid selector. S is not a selector for T."
 	}
 }

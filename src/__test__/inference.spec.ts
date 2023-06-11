@@ -24,13 +24,14 @@ type Organization = {
 
 type Query = {
   currentUser: User;
+  getUser: (args: {id: string}) => User
 };
 
 const query = make<Query>();
 
 describe("inference", () => {
   it("should infer the result of simple queries", () => {
-    const userName = query({
+    const selector = query({
       currentUser: {
         name: true,
         location: {
@@ -39,7 +40,29 @@ describe("inference", () => {
       },
     });
 
-    const result = null as unknown as Infer<typeof userName>;
+    const result = null as unknown as Infer<typeof selector>;
+
+    expectTypeOf(result).toEqualTypeOf<{
+      currentUser: {
+        name: string;
+        location: {
+          zip: number;
+        };
+      };
+    }>();
+  });
+
+  it("should infer the result of constant queries", () => {
+    const selector = query({
+      currentUser: {
+        name: true,
+        location: {
+          zip: true,
+        },
+      },
+    } as const);
+
+    const result = null as unknown as Infer<typeof selector>;
 
     expectTypeOf(result).toEqualTypeOf<{
       currentUser: {
@@ -52,7 +75,7 @@ describe("inference", () => {
   });
 
   it("should infer the result of queries with arrays", () => {
-    const userName = query({
+    const selector = query({
       currentUser: {
         org: {
           members: {
@@ -62,7 +85,7 @@ describe("inference", () => {
       },
     });
 
-    const result = null as unknown as Infer<typeof userName>;
+    const result = null as unknown as Infer<typeof selector>;
 
     expectTypeOf(result).toEqualTypeOf<{
       currentUser: {
@@ -76,7 +99,7 @@ describe("inference", () => {
   });
 
   it("should infer the result of queries with type cycles", () => {
-    const userName = query({
+    const selector = query({
       currentUser: {
         org: {
           leader: {
@@ -86,7 +109,7 @@ describe("inference", () => {
       },
     });
 
-    const result = null as unknown as Infer<typeof userName>;
+    const result = null as unknown as Infer<typeof selector>;
 
     expectTypeOf(result).toEqualTypeOf<{
       currentUser: {
@@ -96,6 +119,22 @@ describe("inference", () => {
           };
         };
       };
+    }>();
+  });
+
+  it("should infer the result of queries with arguments", () => {
+    const selector = query({
+      getUser: [{id: 'mullholland'}, {
+        name: true
+      }]
+    } as const); // const is necessary for queries containing tuples
+
+    const result = null as unknown as Infer<typeof selector>;
+
+    expectTypeOf(result).toEqualTypeOf<{
+      getUser: {
+        name: string
+      }
     }>();
   });
 });

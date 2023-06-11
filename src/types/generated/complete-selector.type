@@ -9,6 +9,8 @@ export type function CompleteSelector = (T) => ^{
 					return true
 				} else if(T[Key] extends Array<infer U>) {
 					return CompleteSelector<U>
+				} else if(T[Key] extends type (args: infer A) => infer R) {
+					return [A, CompleteSelector<R>]
 				} else {
 					return CompleteSelector<T[Key]>
 				}

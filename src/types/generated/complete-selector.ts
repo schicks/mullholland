@@ -5,5 +5,7 @@ export type CompleteSelector<T> = {
     ? true
     : T[Key] extends Array<infer U>
     ? CompleteSelector<U>
+    : T[Key] extends (args: infer A) => infer R
+    ? [A, CompleteSelector<R>]
     : CompleteSelector<T[Key]>;
 };
